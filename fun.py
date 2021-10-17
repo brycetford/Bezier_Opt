@@ -65,3 +65,5 @@ if __name__ == "__main__":
     print(gauss.eval(X))
     print("Gaussian2d Working")
 
+
+
