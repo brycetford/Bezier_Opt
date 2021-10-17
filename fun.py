@@ -18,10 +18,10 @@ class Bezier:
     def eval(self, t):
 
         result = np.zeros((self.dim, 1))
-        n = self.order
+        n = self.order-1
 
-        for i in range(n):
-            b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
+        for i in range(n+1):
+            b_ni = bin(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
             result = result + b_ni*self.params[:, i]
 
         return result
@@ -30,27 +30,27 @@ class Bezier:
     def d_dt(self, t):
 
         result = np.zeros((self.dim, 1))
-        n = self.order
+        n = self.order-2
 
-        for i in range(n-1):
-            b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
+        for i in range(n+1):
+            b_ni = bin(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
             result = result + b_ni*(self.params[:, i+1] - self.params[:, i])
 
-        return result * n
+        return result * (n+1)
 
     # Evaluate 2nd time derivative at given t (0 <= t <= 1)
     def d2_dt2(self, t):
 
         result = np.zeros((self.dim, 1))
-        n = self.order
+        n = self.order-3
         if n < 2:
             return result
 
-        for i in range(n-2):
-            b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
+        for i in range(n+1):
+            b_ni = bin(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
             result = result + b_ni*(self.params[:, i+2] - 2*self.params[:, i+1] + self.params[:, i])
 
-        return result * n*(n-1)
+        return result * (n+1)*(n+2)
 
 class Gaussian2d:
 
@@ -73,6 +73,10 @@ class Gaussian2d:
         dist = x-self.loc
         arg = (dist.T.dot(self.cov)).dot(dist)
         return math.exp(-0.5 * arg)
+
+# Binomial Coefficient
+def bin(n, r):
+    return math.factorial(n) // math.factorial(r) // math.factorial(n-r)
 
 
 # Testing

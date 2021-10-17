@@ -1,6 +1,7 @@
 import numpy as np
 import math
 import fun
+import matplotlib.pyplot as plt
 
 def loading_function():
     Cov = np.mat('2 0; 0 5')
@@ -15,6 +16,10 @@ def eval_load(path, load_fun, n):
         t = i/n
         s_t.append(path.eval(t))
 
+    s = np.array([s_t]).T
+    plt.scatter(s[:, 0], s[:, 1])
+    plt.show()
+
     load = 0
     for i in range(n-1):
         u = load_fun.eval(s_t[i])
@@ -27,8 +32,8 @@ def eval_load(path, load_fun, n):
 
 if __name__ == "__main__":
     # Initial guess for path
-    Params = np.mat('[0 0; 2 2; 4 4]').T
-    B = fun.Bezier(2, 3, Params)
+    Params = np.mat('[0 0; 0 2; 2 -1; 3 3]').T
+    B = fun.Bezier(2, 4, Params)
 
     Load = loading_function()
 
