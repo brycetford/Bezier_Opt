@@ -32,5 +32,5 @@ if __name__ == "__main__":
 
     Load = loading_function()
 
-    curr_load = eval_load(B, Load, 100)
+    curr_load = eval_load(B, Load, 20)
     print(curr_load)

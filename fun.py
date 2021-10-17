@@ -19,11 +19,24 @@ class Bezier:
 
         result = np.zeros((self.dim, 1))
 
-        for i in range(self.order):
-            c = math.comb(self.order, i) * ((1-t)**(self.order-i)) * t**i
-            result = result + c*self.params[:, i]
+        n = self.order
+        for i in range(n):
+            b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
+            result = result + b_ni*self.params[:, i]
 
         return result
+
+    # Evaluate 1rst time derivative at given t (0 <= t <= 1)
+    def d_dt(self, t):
+
+        result = np.zeros((self.dim, 1))
+
+        n = self.order
+        for i in range(n-1):
+            b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
+            result = result + b_ni*(self.params[:, i+1] - self.params[:, i])
+
+        return result * n
 
 class Gaussian2d:
 
