@@ -50,7 +50,7 @@ class Bezier:
             b_ni = math.comb(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
             result = result + b_ni*(self.params[:, i+2] - 2*self.params[:, i+1] + self.params[:, i])
 
-        return result * n
+        return result * n*(n-1)
 
 class Gaussian2d:
 
