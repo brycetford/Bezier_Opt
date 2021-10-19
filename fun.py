@@ -43,14 +43,22 @@ class Bezier:
 
         result = np.zeros((self.dim, 1))
         n = self.order-3
-        if n < 2:
-            return result
 
         for i in range(n+1):
             b_ni = bin(n, i) * ((1-t)**(n-i)) * t**i  # Bernstein polynomial b(n, i)
             result = result + b_ni*(self.params[:, i+2] - 2*self.params[:, i+1] + self.params[:, i])
 
         return result * (n+1)*(n+2)
+
+    def curvature(self, t):
+
+        B_dot = self.d_dt(t)
+        B_2dot = self.d2_dt2(t)
+        numer = np.hstack((B_dot, B_2dot))
+        denom = np.linalg.norm(B_dot)**3
+
+        return abs(np.linalg.det(numer)/denom)
+
 
 class Gaussian2d:
 
@@ -82,9 +90,10 @@ def bin(n, r):
 # Testing
 if __name__ == "__main__":
     # Bezier
-    Params = np.mat('[1 2; 3 4; 6 7]').T
+    Params = np.mat('[1 2; -3 -1; 6 7]').T
     B = Bezier(2, 3, Params)
     print(B.eval(0.4))
+    print(B.curvature(0.5))
     print("Bezier Working")
 
     # Gaussian2d
