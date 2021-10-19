@@ -60,6 +60,7 @@ class Bezier:
         return abs(np.linalg.det(numer)/denom)
 
 
+
 class Gaussian2d:
 
     # Create a Gaussian distribution in 2d with a given covariance matrix
@@ -72,7 +73,7 @@ class Gaussian2d:
             raise SyntaxError('Requires 1x2 location vector (as a np matrix 1x2)')
 
         # 2d rotation matrix
-        R = np.array([math.cos(rot), math.sin(rot), -math.sin(rot), math.cos(rot)]).reshape((2, 2))
+        R = np.mat([math.cos(rot), math.sin(rot), -math.sin(rot), math.cos(rot)]).reshape((2, 2))
 
         self.cov = (R.dot(cov)).dot(R.T)    # Rotate cov by rot
         self.loc = loc

@@ -35,16 +35,23 @@ def eval_load(path, load_fun, n):
 
     return load
 
+
+def delta_curve(curvature):
+    if curvature > 1:
+        return 1
+    return 0
+
+
 def eval_curve(path, n):
-    lam = 20
+    lam = 10
     curv = 0
     for i in range(n):
         dt = i/n
-        curv += path.curvature(dt) * np.linalg.norm(path.d_dt(dt))
+        curv += path.curvature(dt) * np.linalg.norm(path.d_dt(dt)) * delta_curve(path.curvature(dt))
     return math.exp(curv/lam)
 
 
-def gradient(load_fun, curr_load, params, n):
+def gradient(load_fun, curr_load, curr_curv, params, n):
     h = 0.1  # How far to 'nudge' each parameter in gradient computation
     size = params.shape
 
@@ -57,13 +64,16 @@ def gradient(load_fun, curr_load, params, n):
     dL_dBx = (eval_load(d_dBx, load_fun, n) - curr_load) / h
     dL_dBy = (eval_load(d_dBy, load_fun, n) - curr_load) / h
 
-    return np.array([0, dL_dBx, 0, 0, dL_dBy, 0]).reshape(size)
+    dC_dBx = (eval_curve(d_dBx, n) - curr_curv) / h
+    dC_dBy = (eval_curve(d_dBy, n) - curr_curv) / h
+
+    return np.array([0, dL_dBx + dC_dBx, 0, 0, dL_dBy + dC_dBy, 0]).reshape(size)
 
 
 def visualize_cost(load_fun, n):
     r_min, r_max = 0.1, 1.9
-    xaxis = np.arange(r_min, r_max, 0.05)
-    yaxis = np.arange(r_min, r_max, 0.05)
+    xaxis = np.arange(r_min, r_max, 0.1)
+    yaxis = np.arange(r_min, r_max, 0.1)
     x, y = np.meshgrid(xaxis, yaxis)
     results = load_wrapper(x, y, load_fun, n) + curve_wrapper(x, y, n)
     figure = pyplot.figure()
@@ -82,6 +92,7 @@ def load_wrapper(x, y, load_fun, n):
 
     return results
 
+
 def curve_wrapper(x, y, n):
     results = np.zeros((n, n))
     for i in range(n):
@@ -98,7 +109,7 @@ if __name__ == "__main__":
     Params = np.mat('[0 0; 1 1; 2 2]').T  # Initial control points fot the Bezier curve
     B = fun.Bezier(2, 3, Params)
 
-    n = 36  # Iterations for numerical computations
+    n = 18  # Iterations for numerical computations
 
     # Loading function
     Load = loading_function()
@@ -106,10 +117,14 @@ if __name__ == "__main__":
 
     alpha = 0.05  # Gradient descent rate
 
+    plot_curve(B, n)
+
     for i in range(n):
         Curr_Load = eval_load(B, Load, n)
-        Params = Params - alpha * gradient(Load, Curr_Load, Params, n)
+        Curr_Curv = eval_curve(B, n)
+        Params = Params - alpha * gradient(Load, Curr_Load, Curr_Curv, Params, n)
         B = fun.Bezier(2, 3, Params)
 
     plot_curve(B, n)
+
     print(Params)
