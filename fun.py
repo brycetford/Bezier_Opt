@@ -52,13 +52,14 @@ class Bezier:
 
     def curvature(self, t):
 
+        eps = 0.1
+
         B_dot = self.d_dt(t)
         B_2dot = self.d2_dt2(t)
         numer = np.hstack((B_dot, B_2dot))
-        denom = np.linalg.norm(B_dot)**3
+        denom = (np.linalg.norm(B_dot) + eps)**3
 
-        return abs(np.linalg.det(numer)/denom)
-
+        return abs(np.linalg.det(numer) / denom)
 
 
 class Gaussian2d:

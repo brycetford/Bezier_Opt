@@ -29,7 +29,7 @@ def eval_load(path, load_fun, n):
 
     for i in range(n - 1):
         dt = (i + 1) / n
-        lf = load_fun.eval(path.eval(dt))
+        lf = load_fun.eval(path.eval(dt)) * np.linalg.norm(path.d_dt(dt))
         load += dt * (li + lf) / 2  # Center
         li = lf
 
@@ -37,13 +37,13 @@ def eval_load(path, load_fun, n):
 
 
 def delta_curve(curvature):
-    if curvature > 1:
+    if curvature > 0.5:
         return 1
     return 0
 
 
 def eval_curve(path, n):
-    lam = 10
+    lam = 25
     curv = 0
     for i in range(n):
         dt = i/n
@@ -71,7 +71,7 @@ def gradient(load_fun, curr_load, curr_curv, params, n):
 
 
 def visualize_cost(load_fun, n):
-    r_min, r_max = 0.1, 1.9
+    r_min, r_max = -1, 3
     xaxis = np.arange(r_min, r_max, 0.1)
     yaxis = np.arange(r_min, r_max, 0.1)
     x, y = np.meshgrid(xaxis, yaxis)
@@ -109,7 +109,7 @@ if __name__ == "__main__":
     Params = np.mat('[0 0; 1 1; 2 2]').T  # Initial control points fot the Bezier curve
     B = fun.Bezier(2, 3, Params)
 
-    n = 18  # Iterations for numerical computations
+    n = 40  # Iterations for numerical computations
 
     # Loading function
     Load = loading_function()
